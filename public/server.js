@@ -176,7 +176,7 @@ app.post('/loan', (req, res) => {
   const loanAmount = Number(amount);
   const now = Date.now();
 
-  const allowed = [5000, 10000, 20000, 50000, 500000, 1000000, 5000000];
+  const allowed = [500, 5000, 10000, 20000, 50000, 500000, 1000000, 5000000];
   if (!allowed.includes(loanAmount))
     return res.status(400).send("Зээлийн дүн буруу");
 
@@ -221,4 +221,5 @@ app.post('/repay-loan', (req, res) => {
 app.listen(PORT, () => {
   console.log("ZAQ Pay");
   console.log("Server running on port " + PORT);
+
 });
