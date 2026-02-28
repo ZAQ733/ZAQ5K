@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Users • Admin</title>
+
+<style>
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background:#eef2f7;
+  display:flex;
+  justify-content:center;
+  padding:40px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 900px;
+  background:#fff;
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 8px 24px rgba(0,0,0,0.1);
+}
+
+th, td {
+  padding:12px;
+  border-bottom:1px solid #d1d5db;
+  text-align:left;
+}
+
+th {
+  background:#2563eb;
+  color:#fff;
+}
+
+tr:hover { background:#f3f4f6; }
+
+input {
+  width:100%;
+  padding:6px;
+  border-radius:6px;
+  border:1px solid #d1d5db;
+}
+
+button {
+  padding:6px 10px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.save-btn { background:#16a34a; color:white; }
+.save-btn:hover { background:#15803d; }
+
+.delete-btn { background:#ef4444; color:white; }
+.delete-btn:hover { background:#b91c1c; }
+</style>
+</head>
+
+<body>
+
+<table>
+<thead>
+<tr>
+  <th>#</th>
+  <th>Нэр</th>
+  <th>Email</th>
+  <th>Password</th>
+  <th>Мөнгө (₮)</th>
+  <th>Зээл</th>
+  <th>Cooldown үлдсэн (минут)</th>
+  <th>Үйлдэл</th>
+</tr>
+</thead>
+
+<tbody id="userTable"></tbody>
+</table>
+
+<script>
+const tbody = document.getElementById("userTable");
+
+// server-с user авч ирэх
+async function fetchUsers() {
+  try {
+    const res = await fetch("/users");
+    const usersObj = await res.json();
+    const users = Object.entries(usersObj).map(([email, data]) => ({ email, ...data }));
+    render(users);
+  } catch (e) {
+    alert("Сервертэй холбогдож чадсангүй: " + e.message);
+  }
+}
+
+// user render хийх
+function render(users){
+  tbody.innerHTML = "";
+  const now = Date.now();
+  const COOLDOWN = 60*60*1000;
+
+  users.forEach((u, i) => {
+    const cooldown = u.loan ? Math.max(0, Math.ceil((COOLDOWN - (now - u.loan.takenAt))/60000)) : 0;
+    const loanAmount = u.loan ? u.loan.amount : 0;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td><input value="${u.name}"></td>
+      <td>${u.email}</td>
+      <td><input value="${u.pass}"></td>
+      <td><input type="number" value="${u.wallet || 0}"></td>
+      <td><input type="number" value="${loanAmount}"></td>
+      <td>${cooldown>0 ? cooldown : ""}</td>
+      <td>
+        <button class="save-btn" onclick="saveUser('${u.email}', ${i})">Хадгалах</button>
+        <button class="delete-btn" onclick="deleteUser('${u.email}')">Устгах</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// user update хийх
+async function saveUser(email, index){
+  const row = tbody.rows[index];
+  const inputs = row.querySelectorAll("input");
+
+  const updatedData = {
+    name: inputs[0].value.trim(),
+    pass: inputs[1].value,
+    wallet: Number(inputs[2].value) || 0,
+    loan: inputs[3].value ? { amount: Number(inputs[3].value), takenAt: Date.now() } : null
+  };
+
+  try {
+    const res = await fetch("/updateUser", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, ...updatedData })
+    });
+
+    if(res.ok){
+      alert("Амжилттай хадгалагдлаа!");
+      fetchUsers();
+    } else {
+      const err = await res.text();
+      alert(err);
+    }
+  } catch(e){
+    alert("Сервертэй холбогдож чадсангүй: " + e.message);
+  }
+}
+
+// user устгах
+async function deleteUser(email){
+  if(!confirm("Энэ хэрэглэгчийг устгах уу?")) return;
+
+  try {
+    const res = await fetch("/deleteUser", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+
+    if(res.ok){
+      alert("Амжилттай устгагдлаа!");
+      fetchUsers();
+    } else {
+      const err = await res.text();
+      alert(err);
+    }
+  } catch(e){
+    alert("Сервертэй холбогдож чадсангүй: " + e.message);
+  }
+}
+
+// page load-д fetch
+fetchUsers();
+</script>
+
+</body>
+</html>

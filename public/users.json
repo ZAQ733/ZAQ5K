@@ -1,0 +1,53 @@
+{
+  "bujinchuluunbat@gmail.com": {
+    "name": "ZAQ",
+    "pass": "1999",
+    "wallet": 52999,
+    "loan": {
+      "amount": 0,
+      "takenAt": 1772279163430
+    }
+  },
+  "uilstuguldur.09@gmail.com": {
+    "name": "Neega",
+    "pass": "Legoking0108",
+    "wallet": 60000,
+    "loan": null
+  },
+  "xavierburger034@gmail.com": {
+    "name": "Naraa",
+    "pass": "nabaabna_2",
+    "wallet": 100001,
+    "loan": {
+      "amount": 0,
+      "takenAt": 1768999463842
+    }
+  },
+  "o.khulan2010@gmail.com": {
+    "name": "Khulan",
+    "pass": "kh99782650",
+    "wallet": 3000807,
+    "loan": null
+  },
+  "alun@0626": {
+    "name": "Alun",
+    "pass": "5454",
+    "wallet": 950000,
+    "loan": null
+  },
+  "amun@1227": {
+    "name": "Amun",
+    "pass": "tsukiararagomen",
+    "wallet": 450000,
+    "loan": null
+  },
+  "anir@0505": {
+    "name": "Anir",
+    "pass": "1999",
+    "wallet": 1000000000,
+    "loan": {
+      "amount": 0,
+      "takenAt": 1771423619556
+    }
+  }
+}
